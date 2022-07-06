@@ -1,13 +1,13 @@
 import time  # to simulate a real time data, time loop
-
 import numpy as np  # np mean, np random
 import pandas as pd  # read csv, df manipulation
 import plotly.express as px  # interactive charts
 import streamlit as st  #data web app development
+import helper
 
 st.set_page_config(
-    page_title="Real-Time Data Science Dashboard",
-    page_icon="✅",
+    page_title="Reviews Analysis Dashboard",
+    page_icon="📚",
     layout="wide",
 )
 
@@ -31,13 +31,21 @@ if input_file is not None:
     col1, col2 = st.columns(2)
 
     with col1:
-        review = st.multiselect(
+        review_col = st.multiselect(
             'Select Column name with Text for Analysis',
             (df.columns))
 
     with col2:
-        rating = st.selectbox(
+        rating_options = df.columns.tolist()
+        rating_options.append("None")
+        rating_col = st.selectbox(
             'Select Column name with Ratings ',
-             (df.columns))
+             (rating_options))
 
+    if rating_col != "None":
+        st.dataframe(df[rating_col].groupby(df[rating_col]).count())
 
+    df[review_col] = df[review_col].astype(str)
+    df["final_text"] = df[review_col].agg(' - '.join, axis=1)
+
+    st.dataframe(helper.prepocessing(df).head())
